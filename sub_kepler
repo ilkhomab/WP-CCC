@@ -1,0 +1,13 @@
+#!/bin/bash --login
+#SBATCH --account=d35
+#SBATCH --partition=gpuq
+#SBATCH --gres=gpu:1
+##SBATCH --constraint=k40
+#SBATCH --nodes=4
+#SBATCH --ntasks-per-node=4
+#SBATCH --time=24:00:00
+#SBATCH --export=NONE
+module list
+export OMP_NUM_THREADS=4
+export NO_STOP_MESSAGE=1
+(time srun --export=ALL -N 4 -n 16 --cpus-per-task=1 --cpu_bind=none /group/d35/ilkhom/mpi-gpu-wp-ccc/main_cc35) >& job.ZZ

@@ -1,0 +1,17 @@
+#!/bin/bash --login
+#SBATCH --partition=gpuq
+##SBATCH -w a089
+#SBATCH --gres=gpu:2
+#SBATCH --constraint=v100
+#SBATCH --nodes=8
+#SBATCH --ntasks-per-node=2
+#SBATCH --account=d35
+#SBATCH --time=24:00:00
+#SBATCH --export=NONE
+#SBATCH --mem=10gb
+##module purge
+##module load pgi/19.7 cuda/10.1 openmpi-ucx-gpu/4.0.2 
+module list
+export OMP_NUM_THREADS=1
+export NO_STOP_MESSAGE=1
+(time srun --export=ALL -u -N 8 -n 16 --cpus-per-task=1 --cpu_bind=none /group/d35/ilkhom/mpi-gpu-wp-ccc/main_dev) >& job.ZZ

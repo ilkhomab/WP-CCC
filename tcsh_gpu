@@ -1,0 +1,22 @@
+#!/bin/csh
+#SBATCH --partition=gpuq
+#SBATCH --gres=gpu:1
+##SBATCH --constraint=p100
+#SBATCH --nodes=2
+#SBATCH --cpus-per-task=14
+#SBATCH --account=d35
+#SBATCH --time=01:00:00
+#SBATCH --export=NONE
+
+ 
+
+limit stacksize unlimited
+setenv OMP_STACKSIZE 1024m
+setenv KMP_STACKSIZE 1024m
+setenv OMP_NUM_THREADS=7
+
+
+module list
+
+(time srun -N 1 n 2 -c 14 --export=All /group/d35/ilkhom/mpi-gpu-wp-ccc/main_dev) >& job.ZZ
+

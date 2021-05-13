@@ -1,0 +1,13 @@
+#!/bin/bash --login
+#SBATCH --partition=gpuq
+#SBATCH --gres=gpu:1
+##SBATCH --constraint=p100
+#SBATCH --nodes=4
+#SBATCH --cpus-per-task=2
+#SBATCH --account=d35
+#SBATCH --time=00:09:59
+#SBATCH --export=NONE
+export OMP_NUM_THREADS=2
+module list
+(time mpirun -c 8 /group/d35/ilkhom/mpi-gpu-wp-ccc/main_dev) >& job.ZZ
+##(time srun -N 4 -n 8 -c 1 --export=All /group/d35/ilkhom/mpi-gpu-wp-ccc/main_dev) >& job.ZZ

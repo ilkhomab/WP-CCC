@@ -1,0 +1,221 @@
+#!/bin/sh -f
+
+echo "KEY=?, 1 for the first run, 2 for the second run"
+read KEY
+
+if [ $KEY -eq 2 ]; then
+echo "This is the second run"
+
+
+
+#echo "Enter the number of folders"
+#read nparts
+nparts=1
+nrhf=1
+nrhl=33
+
+
+
+for ((jj= 52; jj <= 56; jj=jj+4))
+    do    
+      cd en.$jj/
+
+
+find . -name DS_n* -type f -delete
+find . -name EC_n* -type f -delete
+find . -name SDCS* -type f -delete
+find . -name tot* -type f -delete
+find . -name pcs* -type f -delete
+find . -name part* -type f -delete
+find . -name gtot* -type f -delete
+find . -name fort.* -type f -delete
+find . -name cross* -type f -delete
+find . -name all_prob* -type f -delete
+
+#find . -name prob* -type f -delete
+#find . -name amps_dir* -type f -delete
+#find . -name amps_ex* -type f -delete
+#find . -name norm* -type f -delete
+
+#rm prob_1s00
+#rm prob_2s00
+#rm prob_2p00
+#rm prob_2p+1
+#rm prob_2p-1
+#
+#rm amps_dir_1s00
+#rm amps_dir_2s00
+#rm amps_dir_2p00
+#rm amps_dir_2p+1
+#rm amps_dir_2p-1
+#
+#rm amps_ex_1s00
+#rm amps_ex_2s00
+#rm amps_ex_2p00
+#rm amps_ex_2p+1
+#rm amps_ex_2p-1
+#
+#rm norm_1s00
+#rm norm_2s00
+#rm norm_2p00
+#rm norm_2p+1
+#rm norm_2p-1
+
+rm prob 
+rm amps_dir 
+rm amps_ex 
+rm norm 
+
+#set ext=("_2s00" "_2p-1" "_2p00" "_2p+1")
+
+#set ext1="_2s00"
+#set ext2="_2p-1"
+#set ext3="_2p00"
+#set ext4="_2p+1"
+
+#ext[1]="_1s00"
+#ext[2]="_2s00"
+#ext[3]="_2p-1"
+#ext[4]="_2p00"
+#ext[5]="_2p+1"
+
+#for ((ii=1; ii <= 5; ii++))
+#  do
+
+#INSTATE=${ext[${ii}]}
+
+echo "$INSTATE"
+
+FILEPR="prob"
+FILEEX="amps_ex"
+FILEDIR="amps_dir"
+FILENORM="norm"
+
+echo "Combining all impact parameters : "
+
+for ((j=1; j <= $nparts; j++))
+    do
+      cd folder.$j/
+#      nrhf=$((($j-1)*$nel+1))
+#      nrhl=$(($j*$nel))
+
+
+#      sed s/"NRHFIRST NRHLAST"/"$nrhf $nrhl"/ ../data.in > data.in 
+
+#      read nrhf, nrhl sed '8q;d' data.in
+
+#      nrhf=$(awk -v line=8 -v field=1 'NR==line{print $field}' data.in)
+#      nrhl=$(awk -v line=8 -v field=2 'NR==line{print $field}' data.in)
+
+      echo "nrhf and nrhl in folder $j are $nrhf and $nrhl"
+
+
+for ((i=$nrhf; i <= $nrhl; i++))
+    do
+        if [ $i -lt 10 ];         # If $i is smaller than 10
+        then
+            FILE1="prob_00$i"    # Set filename with extra 0
+            FILE2="amps_ex_00$i"    # Set filename with extra 0
+            FILE3="amps_dir_00$i"    # Set filename with extra 0
+            FILE4="norm_00$i"    # Set filename with extra 0
+        else
+            if [ $i -lt 100 ];
+            then
+                FILE1="prob_0$i"    # Set filename with extra 0
+                FILE2="amps_ex_0$i"    # Set filename with extra 0
+                FILE3="amps_dir_0$i"    # Set filename with extra 0
+                FILE4="norm_0$i"    # Set filename with extra 0
+            else
+                FILE1="prob_$i"    # Set filename with extra 0
+                FILE2="amps_ex_$i"    # Set filename with extra 0
+                FILE3="amps_dir_$i"    # Set filename with extra 0
+                FILE4="norm_$i"    # Set filename with extra 0
+            fi   
+        fi
+
+
+        cat $FILE1 >> ../$FILEPR
+        cat $FILE2 >> ../$FILEEX
+        cat $FILE3 >> ../$FILEDIR
+        cat $FILE4 >> ../$FILENORM
+        
+
+#        echo $FILE1 $FILE2 $FILE3                # show file name
+#        > $FILE1 $FILE2 $FILE3                   # create files
+done
+
+cd ..
+
+done
+#sbatch  /group/d35/ilkhom/VODE-WP-CC/jn_express
+
+#done
+#(time mpirun -c 1 /group/d35/ilkhom/mpi-gpu-wp-ccc/main_dev) 
+      sbatch  /group/d35/ilkhom/mpi-gpu-wp-ccc/sub_express_gpu
+#(time /group/d35/ilkhom/cpu-wp-ccc/main_dev) 
+#sbatch  /group/d35/ilkhom/cpu-wp-ccc/jno_zeus
+#sbatch  /group/d35/ilkhom/VODE-WP-CC/jn_express
+#sbatch  /group/d35/ilkhom/VODE-WP-CC/jn
+#(time aprun -B -cc x  /group/d35/ilkhom/VODE-WP-CC/main) 
+#/short/d35/ixa573/VODE-WP-CC/main
+
+        sleep 10s
+
+        cat density_matrix >> ../dn
+        cat cross_sections >> ../css
+
+cd ..
+
+done
+
+else
+
+echo "This is the first run"
+
+#echo "enter the index of the first point rho_min, rho_max, nrho and nparts (nrho/nparts must be integer)"
+echo "enter the index of the first point in points.dat which needs to be calculated" 
+#read ifirst
+ifirst=2
+echo "enter the index of the last point in points.dat which needs to be calculated" 
+#read ilast
+ilast=33
+echo "enter the number of jobs which need to be submitted" 
+#read nparts
+nparts=1
+echo "enter the index of the first folder" 
+#read ifolder
+ifolder=1
+echo "ifirst=$ifirst, ilast=$ilast, nparts=$nparts, ifolder=$ifolder"
+nel=$((($ilast- $ifirst + 1)/ $nparts))
+echo "$nel"
+/group/d35/SIMPSON/main
+#nrhl=$(($ifirst-1))
+nrhf=2
+nrhl=33
+for ((j= 52; j <= 56; j=j+4))
+    do    
+      mkdir en.$j  
+        cp points.dat en.$j/.
+        cp weights.dat en.$j/.
+        cp WPS en.$j/.
+        cd en.$j/
+        sed s/"Ein"/"$j"/ ../data.in > data.in 
+
+        for ((i= $ifolder; i <= $ifolder+$nparts - 1; i++))
+            do
+        #      nrhf=$((($i-1)*$nel+1))
+        #      nrhl=$(($i*$nel))
+              mkdir folder.$i
+              cp points.dat folder.$i/.
+              cp weights.dat folder.$i/.
+              cp WPS folder.$i/.
+              cd folder.$i/
+              sed s/"NRHFIRST NRHLAST"/"$nrhf $nrhl"/ ../data.in > data.in 
+        #      (time mpirun -c 28 /group/d35/ilkhom/mpi-gpu-wp-ccc/main_dev) # >& job 
+              sbatch  /group/d35/ilkhom/mpi-gpu-wp-ccc/sub_gpu
+              cd ..
+            done
+        cd ..
+    done
+
+fi
